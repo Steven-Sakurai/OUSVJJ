@@ -1,0 +1,89 @@
+
+R version 3.3.3 (2017-03-06) -- "Another Canoe"
+Copyright (C) 2017 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> par = c(0.1, 6,  0.25,  0.6,  -0.8,  3,  0,  -0.6,  -0.3, 0.025, 0.02, 0.002)
+> 
+> converge.list = as.numeric(unlist(read.csv('conv.csv', header = F)))
+> success.list = as.numeric(unlist(read.csv('success.csv', header = F)))
+> 
+> print("Total trials: ")
+[1] "Total trials: "
+> print(length(success.list))
+[1] 227
+> print("Successful trails: ")
+[1] "Successful trails: "
+> print(sum(success.list, na.rm = T))
+[1] 163
+> print("Successful Rate: ")
+[1] "Successful Rate: "
+> print(sum(success.list, na.rm = T) / length(success.list))
+[1] 0.7180617
+> 
+> npar = 12
+> est = as.numeric(unlist(read.csv('est.csv', header = F)))
+> est = matrix(est, nrow = length(est)/npar, ncol = npar, byrow = T)
+> 
+> est.par.list = data.frame(est)
+> names(est.par.list) = c("mu", "kappa", "theta", "alpha", "rho", "l0", "l1", "rho_j", "mu_s", "sigma_s", "mu_v", "sigma_v")
+> 
+> print("True: ")
+[1] "True: "
+> print(par)
+ [1]  0.100  6.000  0.250  0.600 -0.800  3.000  0.000 -0.600 -0.300  0.025
+[11]  0.020  0.002
+> print("Mean:")
+[1] "Mean:"
+> print(apply(est.par.list, 2, mean))
+           mu         kappa         theta         alpha           rho 
+ 0.1538299490  4.2906986368  0.2384127809  0.4064850019 -0.7963840493 
+           l0            l1         rho_j          mu_s       sigma_s 
+ 3.0785543790  0.0000000000 -0.4902752074 -0.2875258654  0.0253113986 
+         mu_v       sigma_v 
+ 0.0126209692  0.0004251564 
+> print("Standard Deviation:")
+[1] "Standard Deviation:"
+> print(apply(est.par.list, 2, sd))
+          mu        kappa        theta        alpha          rho           l0 
+0.0328272356 0.7538879911 0.0230608882 0.0155740744 0.0292912150 0.6287892536 
+          l1        rho_j         mu_s      sigma_s         mu_v      sigma_v 
+0.0000000000 0.3943144184 0.0354873380 0.0078923273 0.0117612177 0.0003265427 
+> 
+> library(ggplot2)
+> p1 = ggplot(est.par.list) + geom_histogram(aes(mu))
+> p2 = ggplot(est.par.list) + geom_histogram(aes(kappa))
+> p3 = ggplot(est.par.list) + geom_histogram(aes(theta))
+> p4 = ggplot(est.par.list) + geom_histogram(aes(xi))
+> p5 = ggplot(est.par.list) + geom_histogram(aes(rho))
+> p6 = ggplot(est.par.list) + geom_histogram(aes(l0))
+> p7 = ggplot(est.par.list) + geom_histogram(aes(l1))
+> p8 = ggplot(est.par.list) + geom_histogram(aes(rho_j))
+> p9 = ggplot(est.par.list) + geom_histogram(aes(mu_s))
+> p10 = ggplot(est.par.list) + geom_histogram(aes(sigma_s))
+> p11 = ggplot(est.par.list) + geom_histogram(aes(mu_v))
+> p12 = ggplot(est.par.list) + geom_histogram(aes(sigma_v))
+> 
+> library(grid)
+> library(gridExtra)
+> p = grid.arrange(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, ncol = 3)
+`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+Error in eval(expr, envir, enclos) : object 'xi' not found
+Calls: grid.arrange ... by_layer -> f -> <Anonymous> -> f -> lapply -> FUN -> eval
+Execution halted
