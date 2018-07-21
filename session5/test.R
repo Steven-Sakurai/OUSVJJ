@@ -1,8 +1,7 @@
-set.seed(19263)
-
-n = 50
-len = 2501
-par = c(0.1, 6,  0.25,  0.6,  -0.8,  3,  0,  -0.6,  -0.3, 0.025, 0.02, 0.002)
+set.seed(7491)
+n = 20
+len = 1001
+par = c(0.1, 3,  0.2,  0.1,  -0.6,  3,  0,  -0.6,  -0.03, 0.025, 0.02, 0.01)
 
 require(Rcpp)
 require(BH)
@@ -14,7 +13,7 @@ source('../conv_plot.R')
 sourceCpp('../Simulation.cpp')
 sourceCpp('../nll.cpp', verbose = F)
 
-opts <- list(algorithm="NLOPT_LN_NELDERMEAD", xtol_rel = 1.0e-5, maxeval = 10000)
+opts <- list(algorithm="NLOPT_LN_NELDERMEAD", xtol_rel = 1.0e-6, maxeval = 10000)
 # set lower and upper bound
 lb = c(-0.5, 0.001, 1e-6, 0.001, -0.95, 0, 0, -0.95, -1, 0, 0, 0)
 ub = c(1, 100, 10, 1, 0.95, 10, 0, 0, 0, 1, 1, 1)
@@ -47,7 +46,7 @@ while(i <= n) {
     flag = all(m_list | c_list)
 
     write.table(est_list, file = "./est.csv", sep = ",", append = T, row.names = F, col.names = F, quote = F)
-	write.table(c_list, file = "./conv.csv", sep = ",", append = T, row.names = F, col.names = F, quote = F)
+	write.table(c_list|m_list, file = "./conv.csv", sep = ",", append = T, row.names = F, col.names = F, quote = F)
     write.table(flag, file = "./success.csv", sep = ",", append = T, row.names = F, col.names = F, quote = F)
     
     print(i)

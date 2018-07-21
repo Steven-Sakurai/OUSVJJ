@@ -1,4 +1,4 @@
-par = c(0.1, 6,  0.25,  0.6,  -0.8,  3,  0,  -0.6,  -0.3, 0.025, 0.02, 0.002)
+par = c(0.1, 3,  0.2,  0.1,  -0.6,  3,  0,  -0.6,  -0.03, 0.025, 0.02, 0.01)
 
 converge.list = as.numeric(unlist(read.csv('conv.csv', header = F)))
 success.list = as.numeric(unlist(read.csv('success.csv', header = F)))

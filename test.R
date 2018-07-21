@@ -1,39 +1,41 @@
-
-n = 50
-len = 2501
-par = c(0.1, 6,  0.25,  0.6,  -0.8,  3,  0,  -0.6,  -0.3, 0.025, 0.02, 0.002)
+n = 20
+len = 2001
+npar = 12
+par = c(0.1, 3,  0.2,  0.1,  -0.6,  3,  0,  -0.6,  -0.03, 0.025, 0.02, 0.01)
 
 require(Rcpp)
 require(BH)
 require(nloptr)
 require(ggplot2)
 require(gridExtra)
-options(digits=8)
+options(digits=6)
+
 source('../conv_plot.R')
 sourceCpp('../Simulation.cpp')
 sourceCpp('../nll.cpp', verbose = F)
 
-opts <- list(algorithm="NLOPT_LN_NELDERMEAD", xtol_rel = 1.0e-5, maxeval = 10000)
+opts <- list(algorithm="NLOPT_LN_NELDERMEAD", xtol_rel = 1.0e-6, maxeval = 10000)
 # set lower and upper bound
 lb = c(-0.5, 0.001, 1e-6, 0.001, -0.95, 0, 0, -0.95, -1, 0, 0, 0)
 ub = c(1, 100, 10, 1, 0.95, 10, 0, 0, 0, 1, 1, 1)
 
-npar = 12
 # run n paths
-converge.list = matrix(, nrow = n, ncol = npar)
-est.par.list = matrix(, nrow = n, ncol = npar)
-success.list = vector(mode="numeric", length = n)
-
 i = 1
 while(i <= n) {
-    seed = sample(10000, 5)
+    seed = sample(99999, 5)
     sim = SimOUSVJJ(par, len, log(100), par[3], 1/252, seed[1], seed[2], seed[3], seed[4], seed[5])
     y = sim$y
+    v = sim$v
 
 	f <- function(p) {
 	    return(nll(p, y))
 	}
-    
+
+    print("i:")
+    print(i)
+    print("nll:")
+    print(f(par))
+
     start = Sys.time()
     result = nloptr(x0 = par, eval_f = f, 
        opts = opts, 
@@ -46,19 +48,16 @@ while(i <= n) {
     flag = all(m_list | c_list)
 
     write.table(est_list, file = "./est.csv", sep = ",", append = T, row.names = F, col.names = F, quote = F)
-	write.table(c_list, file = "./conv.csv", sep = ",", append = T, row.names = F, col.names = F, quote = F)
+	write.table(c_list|m_list, file = "./conv.csv", sep = ",", append = T, row.names = F, col.names = F, quote = F)
     write.table(flag, file = "./success.csv", sep = ",", append = T, row.names = F, col.names = F, quote = F)
+    write.table(y, file = "./y.csv", sep = ",", append = T, row.names = F, col.names = F, quote = F)
+    write.table(v, file = "./v.csv", sep = ",", append = T, row.names = F, col.names = F, quote = F)
     
-    print(i)
+    print("time cost:")
     print(Sys.time() - start)
     print(est_list)
-    
-    est.par.list[i, ] = as.numeric(est_list)
-    converge.list[i, ] = c_list
-    success.list[i] = flag
+    print("successful?")
+    print(c_list|m_list)
+
 	i = i + 1
 }
-
-write.csv(file = "convResult.csv", converge.list)
-write.csv(file = "estResult.csv", est.par.list)
-write.csv(file = "successResult.csv", success.list)
